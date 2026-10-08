@@ -1,7 +1,7 @@
 Workbench public demo
-release=2026-10-08-demo3-tour3
+release=2026-10-09-demo3-tour4
 seedVersion=3
 backend-sha256=fbc25dada18daef2b99571e36b1644c77fde06f377239b0505f2758333dd0155
-tour-sha256=eaea78a5db2dcd4ed87c15fe6373e83dc2ffb59dd911b652f0103308f2b2e10c
+tour-sha256=89e147c4033c63a6241e5c168da8ff8aaa1bdb3d87cbd8191b3216f3a97e9ec3
 report-week-conversions=8
 abnormal-reviews=20

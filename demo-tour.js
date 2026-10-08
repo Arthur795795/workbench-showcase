@@ -8,6 +8,7 @@
   var originalOwner = '';
   var locked = new Map();
   var highlight = null;
+  var switchingTourPane = false;
   var stage, evidence, panel, welcome;
   var titles = ['把分散信息变成今日行动', '自动找出需要关注的客户', '让异常跟进有统一的清单', '让处理进展可以接续和追踪', '把日常记录汇总成周报'];
 
@@ -37,7 +38,9 @@
 
   function switchPane(name) {
     selectViewWithoutScroll('crm');
-    document.querySelector('.crm-main-tabs [data-crm-pane="' + name + '"]').click();
+    switchingTourPane = true;
+    try { document.querySelector('.crm-main-tabs [data-crm-pane="' + name + '"]').click(); }
+    finally { switchingTourPane = false; }
   }
 
   function updateFilter(id, value, eventName) {
@@ -178,7 +181,7 @@
 
   function close() {
     if (!ready || step === -1) return;
-    var wasEvidenceOnly = step === 1 || step === 3;
+    var wasEvidenceOnly = !evidence.hidden;
     step = -1;
     unlockRows();
     hideEvidence();
@@ -289,6 +292,14 @@
     element('demoTourClose').addEventListener('click', close);
     element('demoTourPrev').addEventListener('click', previous);
     element('demoTourNext').addEventListener('click', next);
+    shell.querySelectorAll('.crm-main-tabs [data-crm-pane]').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (step === -1 || switchingTourPane) return;
+        unlockRows();
+        hideEvidence();
+        mark(null);
+      });
+    });
     element('demoTicketClose').addEventListener('click', function () { element('demoTicketDialog').close(); });
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && !element('demoTicketDialog').open) close();
