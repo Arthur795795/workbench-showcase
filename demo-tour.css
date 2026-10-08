@@ -1,0 +1,131 @@
+/* Public-demo presentation only. Layers: app 20, demo header 90, ticket dialog native top layer. */
+body.demo-showcase{--demo-offset:44px;padding-top:var(--demo-offset);background:var(--sys-bg,#f3f6fa)}
+body.demo-showcase.demo-in-portfolio{--demo-offset:88px}
+.demo-showcase .hero-scroll{height:calc(100svh - var(--demo-offset))}
+.demo-showcase .demo-hero-cta{pointer-events:auto;display:block;min-height:48px;margin:24px auto 0;padding:11px 24px;border:1px solid #1b4c3c;border-radius:7px;background:#1b4c3c;color:#fff;font:700 14px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;cursor:pointer;white-space:nowrap;transition:background .2s,transform .2s}
+.demo-showcase .demo-hero-cta:hover{background:#123b2e;transform:translateY(-2px)}
+.demo-showcase .demo-hero-cta:active{transform:translateY(1px)}
+.demo-showcase .demo-hero-cta:focus-visible{outline:2px solid #171713;outline-offset:4px}
+.demo-showcase .hero-action{margin-top:9px;padding:3px 18px;font:600 11px/1.3 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;letter-spacing:0;gap:0}
+.demo-showcase .hero-action svg{height:32px}
+.demo-showcase .app-frame{grid-template-columns:146px minmax(0,1fr);min-height:calc(100dvh - var(--demo-offset))}
+.demo-showcase .sidebar{top:var(--demo-offset);height:calc(100dvh - var(--demo-offset));padding-inline:10px}
+.demo-showcase .side-nav{gap:6px;align-items:stretch}
+.demo-showcase .nav-icon{width:100%;height:48px;display:flex;align-items:center;justify-content:flex-start;gap:10px;padding:0 10px;font-size:12px;font-weight:600;line-height:1.4;white-space:nowrap}
+.demo-showcase .nav-icon svg{flex-shrink:0;width:20px;height:20px}
+.demo-showcase .side-bottom{width:100%}
+.demo-showcase .side-nav-group{margin:15px 10px 4px;color:#b2c4dc;font-size:10px;font-weight:600}
+.demo-showcase #business{scroll-margin-top:var(--demo-offset)}
+.demo-showcase .crm-commandbar{top:var(--demo-offset)}
+.demo-masthead{position:fixed;z-index:90;inset:0 0 auto;height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 22px;border-bottom:1px solid #d9e2ec;background:#fff;color:#43566f;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
+.demo-in-portfolio .demo-masthead{top:44px}
+.demo-masthead strong{color:#20344d;font-size:12px;white-space:nowrap}
+.demo-masthead p{margin:0;text-align:right;font-size:11px}
+.demo-showcase .demo-tour-button{min-height:36px;padding:8px 13px;border:1px solid #ccd9e7;border-radius:7px;background:#fff;color:#234e81;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;cursor:pointer;white-space:nowrap}
+.demo-showcase .demo-tour-button:hover{background:#edf3fa}
+.demo-showcase .demo-tour-button:active{transform:translateY(1px)}
+.demo-showcase .demo-tour-button:focus-visible,.demo-showcase .nav-icon:focus-visible{outline:2px solid #356baa;outline-offset:3px}
+.demo-showcase .demo-tour-button.primary{background:#234e81;border-color:#234e81;color:#fff}
+.demo-showcase .demo-tour-button:disabled{cursor:default;opacity:.5;transform:none}
+.demo-tour-welcome{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 24px;margin:0 0 18px;border:1px solid #183957;border-radius:9px;background:#183957;box-shadow:0 10px 24px rgba(24,57,87,.14);color:#fff;scroll-margin-top:calc(var(--demo-offset) + 16px)}
+.demo-tour-welcome strong{font-size:19px;line-height:1.4;color:#fff}
+.demo-tour-welcome p{margin:7px 0 0;max-width:650px;color:#e0e9f2;font-size:13px;line-height:1.65}
+.demo-tour-welcome-actions{display:flex;gap:8px;flex-shrink:0}
+.demo-showcase .demo-tour-welcome .demo-tour-button{min-height:44px;padding:10px 17px;border-color:rgba(255,255,255,.6);background:transparent;color:#fff;font-size:13px}
+.demo-showcase .demo-tour-welcome .demo-tour-button:hover{background:rgba(255,255,255,.13)}
+.demo-showcase .demo-tour-welcome .demo-tour-button.primary{border-color:#fff;background:#fff;color:#183957}
+.demo-showcase .demo-tour-welcome .demo-tour-button.primary:hover{background:#edf3f7}
+.demo-showcase .demo-tour-welcome .demo-tour-button:focus-visible{outline-color:#fff}
+.demo-tour-layout{min-width:0}
+.demo-tour-active .demo-tour-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start;margin-top:20px}
+.demo-tour-stage{min-width:0}
+.demo-tour-panel{position:sticky;top:calc(var(--demo-offset) + 16px);scroll-margin-top:calc(var(--demo-offset) + 16px);align-self:start;padding:21px;border:1px solid #ccd9e7;border-radius:9px;background:#fff;color:#20344d;box-shadow:0 4px 16px rgba(25,50,82,.05)}
+.demo-showcase [hidden]{display:none!important}
+.demo-tour-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;color:#61748a;font-size:11px}
+.demo-tour-panel-header button{border:0;background:transparent;padding:4px;color:#496078;font-size:12px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.demo-tour-panel h3{margin:0 0 12px;color:#20344d;font-size:19px;line-height:1.45;outline:none}
+.demo-tour-panel p{margin:0 0 12px;color:#53667c;font-size:13px;line-height:1.8}
+.demo-tour-panel .demo-tour-role{padding-top:12px;border-top:1px solid #e2e8f0;font-size:11px;color:#60738a}
+.demo-tour-controls{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.demo-tour-active .crm-overview-grid{grid-template-columns:1fr;padding:0}
+.demo-tour-active .kanban{padding:20px 0;grid-template-columns:repeat(3,minmax(0,1fr))}
+.demo-tour-active .crm-flow-section{margin:0;max-width:none}
+.demo-tour-active .crm-flow{grid-template-columns:1fr}
+.demo-tour-active .crm-flow-stage{border-right:0;border-bottom:1px solid #e4eaf1}
+.demo-tour-active .crm-toolbar{padding:0 0 16px}
+.demo-tour-active .crm-table-wrap{padding:0;overflow-x:auto;max-width:100%}
+.demo-tour-active .crm-abnormal-table{min-width:1050px}
+.demo-tour-active .crm-abnormal-table col.crm-col-abnormal-select,.demo-tour-active .crm-abnormal-table col.crm-col-abnormal-actions{display:none}
+.demo-tour-active .crm-abnormal-table td:last-child,.demo-tour-active .crm-abnormal-table th:last-child,.demo-tour-active .crm-abnormal-table td:first-child,.demo-tour-active .crm-abnormal-table th:first-child{display:none}
+.demo-tour-active #crmSaveAbnormalButton,.demo-tour-active #crmArchiveAbnormalButton,.demo-tour-active #crmImportAbnormalButton,.demo-tour-active #crmContextAddButton,.demo-tour-active .crm-selection-bar{display:none!important}
+.demo-tour-active .crm-abnormal-table textarea[readonly]{background:#f8fafc;color:#344d68;cursor:default}
+.demo-tour-highlight{outline:2px solid #356baa;outline-offset:-2px}
+.demo-tour-active .crm-weekly-shell{padding:0}
+.demo-tour-active .crm-weekly-toolbar{flex-direction:column;align-items:stretch}
+.demo-tour-active .crm-weekly-preview{padding:24px;overflow-x:auto}
+.demo-evidence{padding:22px;border:1px solid #d5e0eb;border-radius:9px;background:#fff;color:#20344d;min-width:0}
+.demo-evidence h3{margin:0 0 8px;font-size:18px;color:#20344d}
+.demo-evidence p{color:#53667c;font-size:12px;line-height:1.8;margin:6px 0 16px}
+.demo-evidence-summary{display:flex;gap:24px;flex-wrap:wrap;margin:22px 0}
+.demo-evidence-summary strong{display:block;color:#234e81;font-size:25px;font-variant-numeric:tabular-nums}
+.demo-evidence-summary span{color:#5c6f83;font-size:11px}
+.demo-evidence-scroll{overflow-x:auto;max-width:100%}
+.demo-evidence table{width:100%;border-collapse:collapse;font-size:12px;text-align:left}
+.demo-evidence th{color:#52667d;background:#f3f6fa;white-space:nowrap}
+.demo-evidence th,.demo-evidence td{padding:11px 10px;border-bottom:1px solid #e1e8f0;vertical-align:top}
+.demo-evidence .demo-low-rate{color:#a43e37;font-weight:700}
+.demo-evidence .demo-normal-rate{color:#356447;font-weight:700}
+.demo-evidence dl{margin:20px 0 0}
+.demo-evidence dl>div{padding:14px 0;border-top:1px solid #e1e8f0}
+.demo-evidence dt{margin:0 0 7px;font-size:11px;color:#60738a}
+.demo-evidence dd{margin:0;color:#20344d;font-size:13px;line-height:1.85;overflow-wrap:anywhere}
+.demo-evidence .demo-evidence-note{margin:16px 0 0;font-size:11px;color:#65788e}
+.demo-evidence details{margin-top:18px;border-top:1px solid #e1e8f0;padding-top:16px}
+.demo-evidence summary{color:#234e81;font-size:12px;line-height:1.7;cursor:pointer}
+.demo-evidence summary:focus-visible{outline:2px solid #356baa;outline-offset:4px}
+.demo-ticket-dialog{width:min(540px,calc(100vw - 28px));max-height:85dvh;margin:auto;padding:24px;border:1px solid #ccd9e7;border-radius:10px;background:#fff;color:#20344d;overflow-y:auto}
+.demo-ticket-dialog::backdrop{background:rgba(20,39,65,.3)}
+.demo-ticket-dialog h3{margin:0 0 10px;font-size:20px}
+.demo-ticket-dialog p{font-size:13px;line-height:1.8;overflow-wrap:anywhere}
+.demo-ticket-dialog .demo-ticket-meta{color:#62758c;font-size:12px}
+.demo-ticket-dialog .demo-ticket-footer{margin-top:22px;display:flex;justify-content:flex-end}
+@media(max-width:1199px){
+  .demo-tour-active .demo-tour-layout{grid-template-columns:1fr}
+  .demo-tour-panel{position:static;grid-row:1}
+  .demo-tour-panel-header{margin-bottom:10px}
+  .demo-tour-controls{margin-top:14px}
+  .demo-tour-welcome{align-items:flex-start;flex-direction:column;gap:14px}
+}
+@media(max-width:760px){
+  .demo-showcase .hero-nav{gap:10px}
+  .demo-showcase .hero-brand{font-size:12px;gap:6px;white-space:nowrap}
+  .demo-showcase .hero-links{display:none}
+  .demo-showcase .hero-menu{flex-shrink:0}
+  .demo-showcase .demo-hero-cta{min-height:46px;margin-top:21px;padding:10px 16px;font-size:13px}
+  .demo-showcase .hero-action{margin-top:9px;font-size:10px}
+  .demo-showcase .app-frame{display:block}
+  .demo-showcase .sidebar{position:static;height:auto;display:block;padding:8px 10px;border-right:0}
+  .demo-showcase .side-brand,.demo-showcase .side-bottom,.demo-showcase .side-nav-group{display:none}
+  .demo-showcase .side-nav{display:flex;flex-direction:row;gap:6px;margin:0;overflow-x:auto}
+  .demo-showcase .nav-icon{width:auto;min-width:max-content;height:44px;padding:0 12px;font-size:11px;gap:7px}
+  .demo-showcase .workspace-content{padding:14px 12px 24px}
+  .demo-showcase .topbar{padding:12px}
+  .demo-showcase #view-crm>.header{align-items:flex-start;flex-direction:column;gap:12px;padding-inline:0}
+  .demo-showcase .header-actions{flex-wrap:wrap;justify-content:flex-start;gap:8px}
+  .demo-showcase .crm-commandbar{padding-inline:0;min-width:0}
+  .demo-showcase .crm-main-tabs{min-width:0}
+  .demo-showcase .crm-main-tab{padding:8px 10px}
+  .demo-tour-panel,.demo-evidence,.demo-tour-welcome{padding:16px}
+  .demo-tour-welcome strong{font-size:17px}
+  .demo-tour-welcome p{font-size:12px}
+  .demo-tour-panel p{font-size:12px;line-height:1.75}
+  .demo-tour-active .kanban{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .demo-tour-active .crm-weekly-controls input,.demo-tour-active .crm-weekly-controls select{min-width:0}
+  .demo-tour-active .crm-weekly-preview{padding:18px 12px}
+  .demo-tour-active .crm-weekly-preview table{min-width:560px}
+  .demo-tour-welcome-actions{width:100%;flex-wrap:wrap}
+  .demo-tour-welcome-actions .primary{flex:1}
+  .demo-masthead{padding-inline:14px}
+  .demo-masthead p{max-width:190px;font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.demo-showcase *, .demo-showcase *::before,.demo-showcase *::after{scroll-behavior:auto!important;transition:none!important}}

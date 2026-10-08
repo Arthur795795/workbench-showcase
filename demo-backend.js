@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'workbench-exact-public-demo-v2';
+  var STORAGE_KEY = 'workbench-exact-public-demo-v3';
   var TABLES = ['submitters', 'customers', 'recognition_records', 'requirements', 'import_batches', 'customer_aliases', 'customer_metric_snapshots', 'customer_events', 'abnormal_import_batches', 'abnormal_reviews', 'conversion_periods', 'crm_audit_logs'];
   var listeners = [];
   var session = {user: {id: '00000000-0000-4000-8000-000000000099', email: 'demo@example.invalid'}};
@@ -102,32 +102,32 @@
     var batch = {id: id(300), file_name: '虚构异常客户演示.xlsx', file_hash: 'demo-seed', period_type: '上周',
       period_start: abnormalStart, period_end: abnormalEnd, imported_by: '演示专员', created_at: stamp};
     var abnormalReviews = [
-      {name: '北岸餐饮（演示）', customer: id(104), owner: id(3), rate: 61.5, orders: 19, type: '识别率低', status: '试用中', reason: '规格单位配置冲突，散装和整箱商品被混用', result: '已收集失败样本并建立单位映射，明日复测'},
-      {name: '云杉食集（演示）', customer: id(102), owner: id(2), rate: 75.4, orders: 18, type: '识别率低', status: '试用中', reason: '客户菜单别名不完整，新商品识别不稳定', result: '已补录12个高频别名，等待下一批订单验证'},
-      {name: '竹里鲜食（演示）', customer: null, owner: id(1), rate: 0, orders: 0, type: '未使用', status: null, reason: '本周期未提交订单，需确认接入情况', result: '已联系负责人，约定明日完成首批订单体验'},
-      {name: '翠庭餐配（演示）', customer: null, owner: id(1), rate: 68.3, orders: 46, type: '识别率低', status: '已付费未上线', reason: '纸质订单照片倾斜，数量列与备注列容易串行', result: '已提供拍摄规范并回放10张样本，继续观察'},
-      {name: '山川食材（演示）', customer: null, owner: id(3), rate: 72.1, orders: 32, type: '识别率低', status: '待报上线', reason: '同名商品存在多个包装规格，默认规格不一致', result: '客户已确认常用规格，已提交配置变更'},
-      {name: '青禾餐配（演示）', customer: id(101), owner: id(1), rate: 76.2, orders: 42, type: '识别率低', status: '试用中', reason: '历史菜单中一斤、500克等表述缺少统一换算', result: '已完成单位换算配置，最新人工识别率回升至82.6%'},
-      {name: '稻香供应链（演示）', customer: id(103), owner: id(1), rate: 73.5, orders: 53, type: '识别率低', status: '试用中', reason: '导入周期早期商品字典未完善，拉低周均识别率', result: '已补齐商品字典，最新人工识别率88.2%，推进转化'},
-      {name: '橙谷鲜配（演示）', customer: id(105), owner: id(2), rate: 78.6, orders: 31, type: '识别率低', status: '试用中', reason: '门店习惯使用缩写，部分数量文本无法准确关联', result: '已录入缩写别名，人工复测85.1%，客户反馈良好'},
-      {name: '林间膳房（演示）', customer: id(106), owner: id(1), rate: 79.4, orders: 68, type: '识别率低', status: '已付费未上线', reason: '充值前几批订单中存在小数重量识别偏差', result: '已调整小数重量解析，人工复测91.3%，准备上线资料'},
-      {name: '麦田配餐（演示）', customer: id(107), owner: id(3), rate: 73.6, orders: 47, type: '识别率低', status: '已付费未上线', reason: '老架构历史数据存在重复商品编码', result: '已整理重复编码清单，待客户确认保留项'},
-      {name: '南风餐配（演示）', customer: id(115), owner: id(1), rate: 66.2, orders: 24, type: '识别率低', status: '试用中', reason: '多门店共用菜单导致商品别名冲突', result: '已拆分门店商品映射，安排次日联调'},
-      {name: '清川餐服（演示）', customer: id(116), owner: id(1), rate: 71.9, orders: 35, type: '识别率低', status: '试用中', reason: '手写订单中箱、包单位混用，数量边界不清晰', result: '已提交15张典型样本，跟进识别优化进度'},
-      {name: '松果食集（演示）', customer: id(117), owner: id(2), rate: 0, orders: 0, type: '未使用', status: '试用中', reason: '账号开通后未使用，负责人尚未组织门店培训', result: '已预约远程培训，培训后检查首单提交'},
-      {name: '荷风餐饮（演示）', customer: null, owner: id(1), rate: 64.8, orders: 57, type: '识别率低', status: '待报上线', reason: '长菜单跨页，第二页数量与第一页面单混淆', result: '已规范分页上传方式，补充跨页回归样本'},
-      {name: '青岚鲜配（演示）', customer: null, owner: id(1), rate: 77.3, orders: 29, type: '识别率低', status: '已付费未上线', reason: '商品备注中的加工要求被误判为数量', result: '已补充备注规则，等待客户再次提交验证'},
-      {name: '星河团膳（演示）', customer: null, owner: id(1), rate: 69.7, orders: 81, type: '识别率低', status: '待报上线', reason: '订单图片压缩较重，小字号数量无法稳定读取', result: '已调整图片提交方式并对比原图识别效果'},
-      {name: '榆森食材（演示）', customer: null, owner: id(1), rate: 74.2, orders: 38, type: '识别率低', status: '已付费未上线', reason: '门店SKU与总部商品字典名称存在差异', result: '已对齐26个常用SKU，剩余低频商品继续维护'},
-      {name: '晨露餐配（演示）', customer: null, owner: id(1), rate: 0, orders: 0, type: '未使用', status: null, reason: '门店本周停业，未产生订单', result: '已确认下周恢复营业，恢复后跟进首批订单'},
-      {name: '原野膳食（演示）', customer: null, owner: id(2), rate: 79.8, orders: 63, type: '识别率低', status: '待报上线', reason: '组合套餐与单品混排，套餐数量未正确展开', result: '已整理套餐展开规则，等待产品评估'},
-      {name: '晴川供应链（演示）', customer: null, owner: id(3), rate: 70.5, orders: 44, type: '识别率低', status: '已付费未上线', reason: '旧模板数量列位置变化，导入映射未同步', result: '已更新模板映射并完成首轮回归'}
+      {name: '北岸餐饮（演示）', customer: id(104), owner: id(3), rate: 61.5, orders: 19, type: '识别率低', status: '试用中', reason: '运营核对后台商品配置，发现散装和整箱商品共用规格单位，属于配置冲突', result: '已做：收集失败样本并建立单位映射；下一步：次日回放同批订单，确认散装与整箱数量分别识别'},
+      {name: '云杉食集（演示）', customer: id(102), owner: id(2), rate: 75.4, orders: 18, type: '识别率低', status: '试用中', reason: '运营核对后台菜单和失败订单，发现新商品常用别名尚未补齐', result: '已做：补录12个高频商品别名；下一步：检查下一批订单识别结果，补齐剩余低频别名'},
+      {name: '竹里鲜食（演示）', customer: null, owner: id(1), rate: 0, orders: 0, type: '未使用', status: null, reason: '运营在后台确认本周期无订单记录，客户尚未安排首批体验', result: '已做：联系客户负责人并确认接入正常；下一步：约定次日完成首批订单体验后检查使用情况'},
+      {name: '翠庭餐配（演示）', customer: null, owner: id(1), rate: 68.3, orders: 46, type: '识别率低', status: '已付费未上线', reason: '运营查看后台原始订单照片，发现拍摄倾斜，数量列与备注列边界不清晰', result: '已做：提供拍摄规范并回放10张清晰样本；下一步：观察下一批规范拍摄订单，确认数量识别是否恢复'},
+      {name: '山川食材（演示）', customer: null, owner: id(3), rate: 72.1, orders: 32, type: '识别率低', status: '待报上线', reason: '运营核对后台商品档案，发现同名商品的默认包装规格与客户实际下单规格不一致', result: '已做：请客户确认常用规格并提交配置变更；下一步：变更完成后抽查整箱及零散下单场景'},
+      {name: '青禾餐配（演示）', customer: id(101), owner: id(1), rate: 76.2, orders: 42, type: '识别率低', status: '试用中', reason: '数量换算 Bug：500克未按0.5公斤参与换算，导致部分数量识别错误。人工排查依据：运营在后台核对原始订单、识别结果和菜单单位，回放后复现，确认不是客户配置缺失', result: '已做：整理失败样本并创建 Bug 工单，修复后人工复测识别率回升至82.6%；下一步：继续观察下一周期克、公斤混合订单，确认修复稳定后关闭工单', ticket: 'WO-1006'},
+      {name: '稻香供应链（演示）', customer: id(103), owner: id(1), rate: 73.5, orders: 53, type: '识别率低', status: '试用中', reason: '运营对比后台各日订单，发现周期早期商品字典缺项拉低周均识别率', result: '已做：补齐商品字典，最新人工识别率为88.2%；下一步：连续观察使用情况，并向客户确认是否推进转化'},
+      {name: '橙谷鲜配（演示）', customer: id(105), owner: id(2), rate: 78.6, orders: 31, type: '识别率低', status: '试用中', reason: '运营查看后台原始订单，发现门店商品缩写未关联到商品字典', result: '已做：录入缩写别名，人工复测识别率为85.1%；下一步：跟进新增缩写并确认客户下一批订单效果'},
+      {name: '林间膳房（演示）', customer: id(106), owner: id(1), rate: 79.4, orders: 68, type: '识别率低', status: '已付费未上线', reason: '小数重量解析 Bug：运营在后台回放发现0.5公斤的小数部分被截断，数量输出错误', result: '已做：提交失败样本和 Bug 工单，修复后人工复测识别率为91.3%；下一步：上线前回归0.5、1.25公斤等小数订单，验证通过后关闭工单', ticket: 'WO-1009'},
+      {name: '麦田配餐（演示）', customer: id(107), owner: id(3), rate: 73.6, orders: 47, type: '识别率低', status: '已付费未上线', reason: '运营核对后台老架构商品字典，发现历史数据存在重复商品编码', result: '已做：整理重复编码清单并发送客户确认；下一步：确认保留项后调整字典，回放相关订单'},
+      {name: '南风餐配（演示）', customer: id(115), owner: id(1), rate: 66.2, orders: 24, type: '识别率低', status: '试用中', reason: '运营核对后台门店菜单，发现多门店共用商品别名造成映射冲突', result: '已做：按门店拆分商品映射；下一步：次日联调各门店订单，确认同名商品识别正确'},
+      {name: '清川餐服（演示）', customer: id(116), owner: id(1), rate: 71.9, orders: 35, type: '识别率低', status: '试用中', reason: '运营查看后台手写订单样本，发现箱、包单位混用且书写边界不清晰', result: '已做：收集15张典型样本并向客户说明统一单位的填写方法；下一步：回放规范书写后的样本，评估是否需要进一步识别优化'},
+      {name: '松果食集（演示）', customer: id(117), owner: id(2), rate: 0, orders: 0, type: '未使用', status: '试用中', reason: '运营在后台确认账号开通后无订单，联系客户获知门店尚未组织使用培训', result: '已做：预约远程培训并准备首单示例；下一步：培训后检查首单提交，确认门店可以独立使用'},
+      {name: '荷风餐饮（演示）', customer: null, owner: id(1), rate: 64.8, orders: 57, type: '识别率低', status: '待报上线', reason: '跨页合并 Bug：运营回放后台两页订单，发现第二页数量错误关联至第一页面单', result: '已做：规范分页上传方式并提交跨页回归样本和 Bug 工单；下一步：跟进修复，使用两页及三页订单回归后关闭工单', ticket: 'WO-1014'},
+      {name: '青岚鲜配（演示）', customer: null, owner: id(1), rate: 77.3, orders: 29, type: '识别率低', status: '已付费未上线', reason: '备注提取 Bug：运营在后台核对订单发现加工备注中的数字被错误识别为商品数量', result: '已做：提交原始订单、错误结果和 Bug 工单，补充备注规则样本；下一步：等待修复后回放加工备注场景，核实数量提取结果', ticket: 'WO-1015'},
+      {name: '星河团膳（演示）', customer: null, owner: id(1), rate: 69.7, orders: 81, type: '识别率低', status: '待报上线', reason: '运营查看后台图片，发现二次压缩使小字号数量模糊，原图回放效果正常', result: '已做：指导客户改为提交原图，并对比压缩图与原图效果；下一步：检查下一批原图订单，确认识别率改善'},
+      {name: '榆森食材（演示）', customer: null, owner: id(1), rate: 74.2, orders: 38, type: '识别率低', status: '已付费未上线', reason: '运营核对后台商品字典，发现门店SKU名称与总部商品命名存在差异', result: '已做：对齐26个常用SKU名称；下一步：继续维护剩余低频商品，复核字典与门店订单是否一致'},
+      {name: '晨露餐配（演示）', customer: null, owner: id(1), rate: 0, orders: 0, type: '未使用', status: null, reason: '运营在后台确认本周期无订单，联系客户获知门店本周停业', result: '已做：确认门店下周恢复营业的排期；下一步：恢复营业后跟进首批订单，不按识别 Bug 处理'},
+      {name: '原野膳食（演示）', customer: null, owner: id(2), rate: 79.8, orders: 63, type: '识别率低', status: '待报上线', reason: '套餐展开 Bug：运营在后台回放组合套餐与单品混排订单，发现套餐数量未展开到子商品', result: '已做：整理套餐展开样本和预期结果，提交 Bug 工单；下一步：跟进产品确认与修复，回归混排订单后核查数量', ticket: 'WO-1019'},
+      {name: '晴川供应链（演示）', customer: null, owner: id(3), rate: 70.5, orders: 44, type: '识别率低', status: '已付费未上线', reason: '运营核对后台旧模板与当前订单，发现数量列位置变化后模板映射未更新', result: '已做：更新模板映射并完成首轮回放；下一步：继续验证不同门店的同类模板，确认数量列对应正确'}
     ].map(function (value, index) {
       return {id: id(310 + index), batch_id: batch.id, customer_name: value.name, trial_customer_id: value.customer,
         owner_submitter_id: value.owner, submitter: '演示专员', period_type: '上周', period_start: abnormalStart,
         period_end: abnormalEnd, recognition_rate: value.rate, order_count: value.orders, abnormal_type: value.type,
         online_status: value.status, abnormal_reason: value.reason, follow_up_result: value.result,
-        work_order_url: index % 3 === 0 ? 'https://example.invalid/demo/tickets/WO-' + String(1001 + index) : null,
+        work_order_url: value.ticket ? 'https://example.invalid/demo/tickets/' + value.ticket : null,
         archived_at: null, created_at: stamp, updated_at: stamp};
     });
     var requirements = [
@@ -147,7 +147,7 @@
     return {submitters: submitters, customers: customers, recognition_records: recognitionRecords, requirements: requirements,
       import_batches: [], customer_aliases: [], customer_metric_snapshots: [], customer_events: events,
       abnormal_import_batches: [batch], abnormal_reviews: abnormalReviews, conversion_periods: [], crm_audit_logs: [],
-      demo: true, seedVersion: 2, previousSaturday: previousSaturday};
+      demo: true, seedVersion: 3, previousSaturday: previousSaturday};
   }
 
   function read() {
@@ -155,9 +155,51 @@
     if (!saved) return seed();
     try {
       var state = JSON.parse(saved);
-      if (state.demo === true && state.seedVersion === 2 && TABLES.every(function (table) { return Array.isArray(state[table]); })) return state;
+      if (state.demo === true && state.seedVersion === 3 && TABLES.every(function (table) { return Array.isArray(state[table]); })) return state;
     } catch (error) { /* Rebuild a corrupt local demo, never access production data. */ }
     return seed();
+  }
+
+  function freezeSnapshot(value) {
+    Object.keys(value).forEach(function (key) {
+      if (value[key] && typeof value[key] === 'object') freezeSnapshot(value[key]);
+    });
+    return Object.freeze(value);
+  }
+
+  function tourSource() {
+    var state = read();
+    var batch = state.abnormal_import_batches.find(function (item) { return item.id === id(300); });
+    if (!batch) return freezeSnapshot({available: false, totalCount: 0, abnormalCount: 0, rows: [], mainReviewId: id(315), threshold: 80});
+    var rows = state.abnormal_reviews.filter(function (item) {
+      return item.batch_id === batch.id && item.period_start === batch.period_start && item.period_end === batch.period_end;
+    }).map(function (item) {
+      return {reviewId: item.id, customerName: item.customer_name, recognitionRate: item.recognition_rate,
+        orderCount: item.order_count, periodStart: item.period_start, periodEnd: item.period_end,
+        abnormalType: item.abnormal_type, ownerSubmitterId: item.owner_submitter_id, ownerId: item.owner_submitter_id,
+        abnormalReason: item.abnormal_reason, followUpResult: item.follow_up_result,
+        nextAction: String(item.follow_up_result || '').split('下一步：').slice(1).join('下一步：'),
+        inspectionEvidence: String(item.abnormal_reason || '').indexOf('人工排查依据：') !== -1 ?
+          String(item.abnormal_reason).split('人工排查依据：').slice(1).join('人工排查依据：') : item.abnormal_reason,
+        workOrderUrl: item.work_order_url};
+    });
+    // These normal/boundary rows are fictional import-source examples only, not CRM records.
+    [
+      {name: '海盐食配（演示）', rate: 94.3, orders: 112},
+      {name: '星野团膳（演示）', rate: 89.4, orders: 86},
+      {name: '榕湾餐配（演示）', rate: 80, orders: 52},
+      {name: '溪岸团膳（演示）', rate: 86.4, orders: 39},
+      {name: '柏舟食配（演示）', rate: 81.2, orders: 27}
+    ].forEach(function (item) {
+      rows.push({reviewId: null, customerName: item.name, recognitionRate: item.rate, orderCount: item.orders,
+        periodStart: batch.period_start, periodEnd: batch.period_end, abnormalType: null, ownerSubmitterId: null, ownerId: null,
+        abnormalReason: null, followUpResult: null, nextAction: null, inspectionEvidence: null, workOrderUrl: null});
+    });
+    return freezeSnapshot({available: true, fileName: '虚构全量客户使用数据（演示）.xlsx',
+      periodStart: batch.period_start, periodEnd: batch.period_end, threshold: 80,
+      totalCount: rows.length, abnormalCount: rows.filter(function (item) {
+        return typeof item.recognitionRate === 'number' && item.recognitionRate < 80;
+      }).length, mainReviewId: id(315), rows: rows});
   }
 
   var lastState = read();
@@ -406,9 +448,15 @@
   });
 
   window.WorkbenchDemo = {
-    reset: function () { localStorage.removeItem(STORAGE_KEY); location.reload(); },
+    reset: function () {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('workbench-demo-tour-seen-v1');
+      localStorage.removeItem('workbench-demo-tour-seen-v2');
+      location.reload();
+    },
     storageKey: STORAGE_KEY
   };
+  Object.defineProperty(window.WorkbenchDemo, 'tourSource', {get: tourSource, enumerable: true});
   window.supabase = {
     createClient: function () {
       return {
