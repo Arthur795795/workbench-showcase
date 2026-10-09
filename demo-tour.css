@@ -27,18 +27,23 @@ body.demo-showcase.demo-in-portfolio{--demo-offset:88px}
 .demo-showcase .demo-tour-button:focus-visible,.demo-showcase .nav-icon:focus-visible{outline:2px solid #356baa;outline-offset:3px}
 .demo-showcase .demo-tour-button.primary{background:#234e81;border-color:#234e81;color:#fff}
 .demo-showcase .demo-tour-button:disabled{cursor:default;opacity:.5;transform:none}
-.demo-tour-welcome{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 24px;margin:0 0 18px;border:1px solid #183957;border-radius:9px;background:#183957;box-shadow:0 10px 24px rgba(24,57,87,.14);color:#fff;scroll-margin-top:calc(var(--demo-offset) + 16px)}
-.demo-tour-welcome strong{font-size:19px;line-height:1.4;color:#fff}
-.demo-tour-welcome p{margin:7px 0 0;max-width:650px;color:#e0e9f2;font-size:13px;line-height:1.65}
-.demo-tour-welcome-actions{display:flex;gap:8px;flex-shrink:0}
-.demo-showcase .demo-tour-welcome .demo-tour-button{min-height:44px;padding:10px 17px;border-color:rgba(255,255,255,.6);background:transparent;color:#fff;font-size:13px}
-.demo-showcase .demo-tour-welcome .demo-tour-button:hover{background:rgba(255,255,255,.13)}
-.demo-showcase .demo-tour-welcome .demo-tour-button.primary{border-color:#fff;background:#fff;color:#183957}
-.demo-showcase .demo-tour-welcome .demo-tour-button.primary:hover{background:#edf3f7}
-.demo-showcase .demo-tour-welcome .demo-tour-button:focus-visible{outline-color:#fff}
+.demo-tour-welcome{display:block;width:min(540px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:32px;margin:auto;border:1px solid #ccd9e7;border-radius:12px;background:#fff;box-shadow:0 20px 70px rgba(24,57,87,.24);color:#20344d;overflow-y:auto}
+.demo-tour-welcome::backdrop{background:rgba(17,34,53,.5)}
+.demo-tour-welcome-label{display:block;margin-bottom:14px;color:#234e81;font-size:12px;font-weight:700}
+.demo-tour-welcome h2{margin:0 0 14px;font-size:26px;line-height:1.45;color:#20344d}
+.demo-tour-welcome p{margin:0;color:#53667c;font-size:14px;line-height:1.8}
+.demo-tour-welcome-route{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:24px 0;padding:15px 16px;border-radius:7px;background:#f2f6fa;color:#34516f;font-size:13px;font-weight:600}
+.demo-tour-welcome-route [aria-hidden]{color:#8a9caf}
+.demo-tour-welcome-actions{display:flex;gap:10px;flex-wrap:wrap}
+.demo-showcase .demo-tour-welcome .demo-tour-button{min-height:46px;padding:11px 18px;font-size:13px}
+.demo-tour-welcome-actions .primary{flex:1}
 .demo-tour-layout{min-width:0}
 .demo-tour-active .demo-tour-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start;margin-top:20px}
 .demo-tour-stage{min-width:0}
+.demo-showcase .req-panel{min-width:0;max-width:100%;overflow-x:auto}
+.demo-showcase .req-table{min-width:680px}
+.demo-tour-active .req-panel{padding:0 0 20px}
+.demo-tour-active .req-toolbar{padding-inline:0}
 .demo-tour-panel{position:sticky;top:calc(var(--demo-offset) + 16px);scroll-margin-top:calc(var(--demo-offset) + 16px);align-self:start;padding:21px;border:1px solid #ccd9e7;border-radius:9px;background:#fff;color:#20344d;box-shadow:0 4px 16px rgba(25,50,82,.05)}
 .demo-showcase [hidden]{display:none!important}
 .demo-tour-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;color:#61748a;font-size:11px}
@@ -63,7 +68,7 @@ body.demo-showcase.demo-in-portfolio{--demo-offset:88px}
 .demo-tour-active .crm-weekly-shell{padding:0}
 .demo-tour-active .crm-weekly-toolbar{flex-direction:column;align-items:stretch}
 .demo-tour-active .crm-weekly-preview{padding:24px;overflow-x:auto}
-.demo-evidence{padding:22px;border:1px solid #d5e0eb;border-radius:9px;background:#fff;color:#20344d;min-width:0}
+.demo-evidence{padding:22px;margin-top:20px;border:1px solid #d5e0eb;border-radius:9px;background:#fff;color:#20344d;min-width:0}
 .demo-evidence h3{margin:0 0 8px;font-size:18px;color:#20344d}
 .demo-evidence p{color:#53667c;font-size:12px;line-height:1.8;margin:6px 0 16px}
 .demo-evidence-summary{display:flex;gap:24px;flex-wrap:wrap;margin:22px 0}
@@ -81,6 +86,8 @@ body.demo-showcase.demo-in-portfolio{--demo-offset:88px}
 .demo-evidence dd{margin:0;color:#20344d;font-size:13px;line-height:1.85;overflow-wrap:anywhere}
 .demo-evidence .demo-evidence-note{margin:16px 0 0;font-size:11px;color:#65788e}
 .demo-evidence details{margin-top:18px;border-top:1px solid #e1e8f0;padding-top:16px}
+.demo-evidence>#demoTourExamples{margin:0;border:0;padding:0}
+.demo-evidence>#demoTourExamples[open]>summary{margin-bottom:20px}
 .demo-evidence summary{color:#234e81;font-size:12px;line-height:1.7;cursor:pointer}
 .demo-evidence summary:focus-visible{outline:2px solid #356baa;outline-offset:4px}
 .demo-ticket-dialog{width:min(540px,calc(100vw - 28px));max-height:85dvh;margin:auto;padding:24px;border:1px solid #ccd9e7;border-radius:10px;background:#fff;color:#20344d;overflow-y:auto}
@@ -94,7 +101,6 @@ body.demo-showcase.demo-in-portfolio{--demo-offset:88px}
   .demo-tour-panel{position:static;grid-row:1}
   .demo-tour-panel-header{margin-bottom:10px}
   .demo-tour-controls{margin-top:14px}
-  .demo-tour-welcome{align-items:flex-start;flex-direction:column;gap:14px}
 }
 @media(max-width:760px){
   .demo-showcase .hero-nav{gap:10px}
@@ -115,16 +121,17 @@ body.demo-showcase.demo-in-portfolio{--demo-offset:88px}
   .demo-showcase .crm-commandbar{padding-inline:0;min-width:0}
   .demo-showcase .crm-main-tabs{min-width:0}
   .demo-showcase .crm-main-tab{padding:8px 10px}
-  .demo-tour-panel,.demo-evidence,.demo-tour-welcome{padding:16px}
-  .demo-tour-welcome strong{font-size:17px}
-  .demo-tour-welcome p{font-size:12px}
+  .demo-tour-panel,.demo-evidence{padding:16px}
+  .demo-tour-welcome{padding:22px 20px}
+  .demo-tour-welcome h2{font-size:22px}
+  .demo-tour-welcome p{font-size:13px}
+  .demo-tour-welcome-route{padding:13px 10px;font-size:12px}
   .demo-tour-panel p{font-size:12px;line-height:1.75}
   .demo-tour-active .kanban{grid-template-columns:repeat(2,minmax(0,1fr))}
   .demo-tour-active .crm-weekly-controls input,.demo-tour-active .crm-weekly-controls select{min-width:0}
   .demo-tour-active .crm-weekly-preview{padding:18px 12px}
   .demo-tour-active .crm-weekly-preview table{min-width:560px}
   .demo-tour-welcome-actions{width:100%;flex-wrap:wrap}
-  .demo-tour-welcome-actions .primary{flex:1}
   .demo-masthead{padding-inline:14px}
   .demo-masthead p{max-width:190px;font-size:10px}
 }

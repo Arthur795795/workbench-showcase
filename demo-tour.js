@@ -1,16 +1,23 @@
 (function () {
   'use strict';
 
-  var SEEN_KEY = 'workbench-demo-tour-seen-v2';
   var step = -1;
   var ready = false;
-  var originalSearch = '';
-  var originalOwner = '';
+  var reminderHandled = false;
+  var selectingTourView = false;
+  var paused = false;
   var locked = new Map();
   var highlight = null;
   var switchingTourPane = false;
   var stage, evidence, panel, welcome;
-  var titles = ['把分散信息变成今日行动', '自动找出需要关注的客户', '让异常跟进有统一的清单', '让处理进展可以接续和追踪', '把日常记录汇总成周报'];
+  var steps = [
+    {pane: 'overview', name: '今日驾驶舱', title: '今天应该优先跟进谁？', target: '.crm-overview-grid', content: '<p>到期提醒、待转化和待上线客户集中在同一个入口，运营人员每天打开就能判断行动优先级。</p><p>点击客户可查看详情，减少跨表查找和跟进遗漏。</p>'},
+    {pane: 'customers', name: '试用客户盘点', title: '把试用过程变成持续跟进', target: '#crmTable', content: '<p>客户负责人、试用期限、人工录入的识别效果和下一步行动放在一起，帮助运营持续跟进试用，而不是等到到期才回头查记录。</p><p>可以按状态、负责人筛选或搜索客户，再打开详情查看历史记录。</p>'},
+    {pane: 'conversion', name: '转化客户盘点', title: '充值之后，继续追踪上线', target: '#crmConversionTable', content: '<p>已经充值的客户仍需要跟进上线进展。按周期集中查看待上线与正式上线客户，让转化后的交接和推进有据可查。</p><p>客户归属、充值记录和下一步保持在同一处。</p>'},
+    {pane: 'abnormal', name: '异常客户盘点', title: '自动筛出异常，接续处理进展', target: '#crmAbnormalTable', content: '<p>导入系统全量使用数据后，Workbench 自动筛出商品数量识别率低于 80% 的客户，省去逐行人工查表。</p><p>运营人员到后台确认原因后，记录已做措施和下一步应对；属于 Bug 的问题关联工单，让同事接手时知道处理到哪里。</p>'},
+    {pane: 'requirements', name: '需求管理', title: '让需求有来源，也有处理状态', target: '[data-crm-pane-content="requirements"]', content: '<p>客户反馈与内部运营需求统一记录，保留提报人、优先级和处理状态，减少需求散落在聊天中、后续无人跟进的问题。</p><p>客户需求关联对应客户，内部运营需求单独管理。</p>'},
+    {pane: 'weekly', name: '周报生成', title: '把日常记录汇总成周报', target: '#crmWeeklyQuality', content: '<p>按统计周期与负责专员汇总试用、转化、异常和关键记录，并在生成前检查数据完整性，减少每周重复统计与复制粘贴。</p><p>周报仍可编辑和复制。切换到这里后，可以使用页面中的“生成周报”查看结果。</p>'}
+  ];
 
   function escape(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
@@ -24,16 +31,15 @@
     var data = source();
     return data.rows.find(function (row) { return row.reviewId === data.mainReviewId; }) || data.rows.find(function (row) { return row.recognitionRate < 80; });
   }
-  function setSeen() { try { localStorage.setItem(SEEN_KEY, '1'); } catch (error) { /* Viewing remains available without storage. */ } }
-  function hasSeen() { try { return localStorage.getItem(SEEN_KEY) === '1'; } catch (error) { return false; } }
   function button(id, text, primary) { return '<button type="button" id="' + id + '" class="demo-tour-button' + (primary ? ' primary' : '') + '">' + text + '</button>'; }
 
   function selectViewWithoutScroll(view) {
     var business = element('business');
     var originalScrollIntoView = business.scrollIntoView;
     business.scrollIntoView = function () {};
+    selectingTourView = true;
     try { document.querySelector('.side-nav [data-view-target="' + view + '"]').click(); }
-    finally { business.scrollIntoView = originalScrollIntoView; }
+    finally { business.scrollIntoView = originalScrollIntoView; selectingTourView = false; }
   }
 
   function switchPane(name) {
@@ -41,12 +47,6 @@
     switchingTourPane = true;
     try { document.querySelector('.crm-main-tabs [data-crm-pane="' + name + '"]').click(); }
     finally { switchingTourPane = false; }
-  }
-
-  function updateFilter(id, value, eventName) {
-    var control = element(id);
-    control.value = value;
-    control.dispatchEvent(new Event(eventName, {bubbles: true}));
   }
 
   function lockRows() {
@@ -73,10 +73,9 @@
     if (highlight) highlight.classList.add('demo-tour-highlight');
   }
 
-  function showEvidence(html, onlyEvidence) {
+  function showEvidence(html) {
     evidence.innerHTML = html;
     evidence.hidden = false;
-    stage.querySelectorAll('.crm-pane').forEach(function (pane) { pane.hidden = !!onlyEvidence; });
   }
 
   function hideEvidence() {
@@ -107,90 +106,112 @@
       '<p class="demo-evidence-note">原因由运营人员在后台确认后填写。参观只需查看，无需完成运营操作。</p>';
   }
 
-  function renderStep() {
+  function activeStep() {
+    var tab = document.querySelector('.crm-main-tabs [data-crm-pane].active');
+    var pane = tab && tab.getAttribute('data-crm-pane');
+    var index = steps.findIndex(function (item) { return item.pane === pane; });
+    return index < 0 ? 0 : index;
+  }
+
+  function keepGuideVisible() {
+    requestAnimationFrame(function () {
+      if (step === -1 || paused) return;
+      var bounds = panel.getBoundingClientRect();
+      var offset = parseFloat(getComputedStyle(document.body).getPropertyValue('--demo-offset')) || 0;
+      if (bounds.top < offset || bounds.bottom > innerHeight) {
+        panel.scrollIntoView({behavior: 'instant', block: 'start'});
+      }
+    });
+  }
+
+  // Rendering an explanation never changes the visitor's filters or selected records.
+  function renderGuide(scrollToGuide) {
     unlockRows();
     hideEvidence();
-    var row = mainRow();
-    var data = source();
-    var content = '';
-    if (step === 0) {
-      switchPane('overview');
-      content = '<p>运营人员每天要判断哪些客户即将到期、需要转化或持续跟进。今日驾驶舱把这些信息集中到同一个入口，减少跨表查找。</p><p>接下来看看 Workbench 如何自动筛选异常、留存处理进展，再生成周报。</p><p class="demo-tour-role">查看页面，点击“下一步”即可。</p>';
-      mark('.crm-overview-grid');
-    } else if (step === 1) {
-      switchPane('abnormal');
-      showEvidence(sourceTable(), true);
-      content = '<p>导入系统全量客户使用数据后，Workbench 自动筛出商品数量识别率低于 80% 的客户，省去逐行人工查表。</p><p>这个虚构批次从 ' + data.totalCount + ' 条记录中筛出 ' + data.abnormalCount + ' 条需要关注的记录；系统提供线索，原因由运营确认。</p><p class="demo-tour-role">查看已准备好的筛选结果，无需上传文件。</p>';
-      mark(evidence);
-    } else if (step === 2) {
-      switchPane('abnormal');
-      updateFilter('crmAbnormalOwnerFilter', '', 'change');
-      updateFilter('crmAbnormalSearch', '', 'input');
+    var item = steps[step];
+    if (item.pane === 'abnormal') {
       lockRows();
-      content = '<p>筛选结果进入统一的异常清单，可以按负责人和统计周期查看，减少客户跟进遗漏。</p><p>客户指标与后续处理记录放在同一处，运营同事能快速找到需要继续跟进的客户。</p><p class="demo-tour-role">查看异常清单，无需填写处理记录。</p>';
-      mark('#crmAbnormalTable');
-    } else if (step === 3) {
-      switchPane('abnormal');
-      updateFilter('crmAbnormalOwnerFilter', '', 'change');
-      updateFilter('crmAbnormalSearch', row.customerName, 'input');
-      lockRows();
-      showEvidence(savedCard(row), true);
-      content = '<p>异常原因、已做措施和下一步应对集中记录，解决处理进展散落在聊天和表格中、同事接手困难的问题。</p><p>属于 Bug 的问题关联工单，后续修复和复测有据可追。</p><p class="demo-tour-role">可展开示例，也可直接点击“下一步”。</p>';
-      mark(evidence);
-    } else {
-      switchPane('weekly');
-      var end = new Date(data.periodEnd + 'T00:00:00Z');
-      end.setUTCDate(end.getUTCDate() + 1);
-      element('crmWeeklyDate').value = end.toISOString().slice(0, 10);
-      element('crmWeeklyOwner').value = row.ownerId;
-      window.generateWeeklyReport();
-      content = '<p>日常记录直接按统计周期与负责专员汇总成周报，并检查数据完整性，减少每周重复统计与复制粘贴。</p><p>试用、转化、异常和处理进展保持同一口径；生成后仍可编辑和复制。</p><p class="demo-tour-role">查看生成结果。完成后可自由探索全部模块。</p>';
-      mark('#crmWeeklyQuality');
+      if (source().available && mainRow()) showEvidence('<details id="demoTourExamples"><summary>按需查看：全量筛选结果与已填写的示例</summary>' + sourceTable() + savedCard(mainRow()) + '</details>');
     }
-    element('demoTourTitle').textContent = titles[step];
-    element('demoTourContent').innerHTML = content;
-    element('demoTourProgress').textContent = '参观进度 ' + (step + 1) + ' / ' + titles.length;
-    element('demoTourPrev').disabled = step === 0;
-    element('demoTourNext').textContent = step === titles.length - 1 ? '完成参观' : '下一步';
-    panel.scrollIntoView({behavior: 'instant', block: 'start'});
-    element('demoTourTitle').focus({preventScroll: true});
-  }
-
-  function start() {
-    if (!ready) return;
-    if (!source().available || !mainRow()) {
-      welcome.hidden = false;
-      element('demoTourRestart').hidden = true;
-      welcome.querySelector('p').textContent = '当前浏览器中的示例批次已被修改或删除。点击“重置演示”恢复完整参观数据，或继续自由探索。';
-      selectViewWithoutScroll('crm');
-      welcome.scrollIntoView({behavior: 'smooth', block: 'start'});
-      return;
-    }
-    if (step === -1) {
-      originalSearch = element('crmAbnormalSearch').value;
-      originalOwner = element('crmAbnormalOwnerFilter').value;
-    }
-    setSeen();
-    welcome.hidden = true;
-    element('demoTourRestart').hidden = false;
     panel.hidden = false;
-    document.body.classList.add('demo-tour-active');
-    step = 0;
-    renderStep();
+    mark(item.target);
+    element('demoTourTitle').textContent = item.title;
+    element('demoTourContent').innerHTML = item.content + '<p class="demo-tour-role">当前模块：' + item.name + '。可点击其他模块，讲解会同步切换；无需填写运营记录。</p>';
+    element('demoTourProgress').textContent = '产品导览 ' + (step + 1) + ' / ' + steps.length + ' · ' + item.name;
+    element('demoTourPrev').disabled = step === 0;
+    element('demoTourNext').textContent = step === steps.length - 1 ? '完成参观' : '下一步';
+    if (scrollToGuide) {
+      panel.scrollIntoView({behavior: 'instant', block: 'start'});
+      element('demoTourTitle').focus({preventScroll: true});
+    } else keepGuideVisible();
   }
 
-  function close() {
-    if (!ready || step === -1) return;
-    var wasEvidenceOnly = !evidence.hidden;
-    step = -1;
+  function goToStep(index) {
+    step = index;
+    paused = false;
+    document.body.classList.add('demo-tour-active');
+    switchPane(steps[step].pane);
+    if (steps[step].pane === 'weekly') window.generateWeeklyReport();
+    renderGuide(true);
+  }
+
+  function dismissWelcome() {
+    reminderHandled = true;
+    if (welcome.open) welcome.close();
+    welcome.hidden = true;
+  }
+
+  function showWelcome() {
+    if (reminderHandled || step !== -1 || welcome.open) return;
+    welcome.hidden = false;
+    welcome.showModal();
+  }
+
+  function syncManualPane() {
+    if (step === -1 || paused || switchingTourPane) return;
+    step = activeStep();
+    renderGuide(false);
+  }
+
+  function pauseGuide() {
+    if (step === -1) return;
+    paused = true;
     unlockRows();
     hideEvidence();
     mark(null);
     panel.hidden = true;
     document.body.classList.remove('demo-tour-active');
-    updateFilter('crmAbnormalOwnerFilter', originalOwner, 'change');
-    updateFilter('crmAbnormalSearch', originalSearch, 'input');
-    if (wasEvidenceOnly) switchPane('abnormal');
+  }
+
+  function resumeGuide() {
+    paused = false;
+    step = activeStep();
+    document.body.classList.add('demo-tour-active');
+    renderGuide(false);
+  }
+
+  function start() {
+    if (!ready) return;
+    if (!source().available || !mainRow()) {
+      element('demoTourWelcomeDescription').textContent = '当前浏览器中的示例批次已被修改或删除。点击“重置演示”恢复完整参观数据，或继续自由探索。';
+      reminderHandled = false;
+      selectViewWithoutScroll('crm');
+      showWelcome();
+      return;
+    }
+    dismissWelcome();
+    goToStep(0);
+  }
+
+  function close() {
+    if (!ready || step === -1) return;
+    step = -1;
+    paused = false;
+    unlockRows();
+    hideEvidence();
+    mark(null);
+    panel.hidden = true;
+    document.body.classList.remove('demo-tour-active');
     element('demoTourRestart').focus({preventScroll: true});
   }
 
@@ -256,13 +277,14 @@
     document.querySelector('.demo-ribbon').remove();
 
     var shell = element('view-crm');
-    welcome = document.createElement('section');
+    welcome = document.createElement('dialog');
     welcome.id = 'demoTourWelcome';
     welcome.className = 'demo-tour-welcome';
-    welcome.setAttribute('aria-label', '首次体验指引');
-    welcome.innerHTML = '<div><strong>第一次体验 Workbench？</strong><p>用 2 分钟看懂今天该处理谁、异常如何筛出，以及周报怎样一键生成。只需查看和点击下一步。</p></div><div class="demo-tour-welcome-actions">' + button('demoTourStart', '开始参观', true) + button('demoTourSkip', '先自由探索', false) + '</div>';
-    welcome.hidden = hasSeen();
-    shell.insertBefore(welcome, shell.querySelector('.crm-commandbar'));
+    welcome.setAttribute('aria-labelledby', 'demoTourWelcomeTitle');
+    welcome.setAttribute('aria-describedby', 'demoTourWelcomeDescription');
+    welcome.innerHTML = '<span class="demo-tour-welcome-label">Workbench 产品导览</span><h2 id="demoTourWelcomeTitle">从这里，看懂客户运营如何提效</h2><p id="demoTourWelcomeDescription">用 2 分钟了解 Workbench 如何把客户跟进、异常盘点和周报汇总串起来。查看六个模块，了解每一步解决的问题。</p><div class="demo-tour-welcome-route" aria-label="主要工作流"><span>客户跟进</span><span aria-hidden="true">→</span><span>异常处理</span><span aria-hidden="true">→</span><span>一键周报</span></div><div class="demo-tour-welcome-actions">' + button('demoTourStart', '开始 2 分钟产品导览', true) + button('demoTourSkip', '自由探索', false) + '</div>';
+    welcome.hidden = true;
+    document.body.appendChild(welcome);
 
     var layout = document.createElement('div');
     layout.className = 'demo-tour-layout';
@@ -273,7 +295,7 @@
     evidence.id = 'demoTourEvidence';
     evidence.className = 'demo-evidence';
     evidence.hidden = true;
-    stage.prepend(evidence);
+    stage.appendChild(evidence);
     panel = document.createElement('aside');
     panel.id = 'demoTourPanel';
     panel.className = 'demo-tour-panel';
@@ -282,27 +304,57 @@
     panel.innerHTML = '<div class="demo-tour-panel-header"><span id="demoTourProgress"></span><button type="button" id="demoTourClose">结束参观</button></div><h3 id="demoTourTitle" tabindex="-1"></h3><div id="demoTourContent" aria-live="polite"></div><div class="demo-tour-controls">' + button('demoTourPrev', '上一步', false) + button('demoTourNext', '下一步', true) + '</div>';
     layout.append(stage, panel);
     shell.appendChild(layout);
-    shell.querySelector('.header-actions').insertAdjacentHTML('afterbegin', button('demoTourRestart', '参观指引', false));
-    element('demoTourRestart').hidden = !welcome.hidden;
+    shell.querySelector('.header-actions').insertAdjacentHTML('afterbegin', button('demoTourRestart', '产品导览', true));
     document.body.insertAdjacentHTML('beforeend', '<dialog class="demo-ticket-dialog" id="demoTicketDialog" aria-labelledby="demoTicketTitle"><h3 id="demoTicketTitle"></h3><div id="demoTicketContent"></div><div class="demo-ticket-footer">' + button('demoTicketClose', '关闭工单', false) + '</div></dialog>');
 
     element('demoTourStart').addEventListener('click', start);
     element('demoTourRestart').addEventListener('click', start);
-    element('demoTourSkip').addEventListener('click', function () { setSeen(); welcome.hidden = true; element('demoTourRestart').hidden = false; });
+    element('demoTourSkip').addEventListener('click', dismissWelcome);
+    welcome.addEventListener('cancel', function (event) { event.preventDefault(); dismissWelcome(); });
     element('demoTourClose').addEventListener('click', close);
     element('demoTourPrev').addEventListener('click', previous);
     element('demoTourNext').addEventListener('click', next);
     shell.querySelectorAll('.crm-main-tabs [data-crm-pane]').forEach(function (tab) {
       tab.addEventListener('click', function () {
         if (step === -1 || switchingTourPane) return;
-        unlockRows();
-        hideEvidence();
-        mark(null);
+        syncManualPane();
       });
     });
+    document.querySelectorAll('[data-view-target]').forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        if (selectingTourView || trigger.disabled) return;
+        if (trigger.getAttribute('data-view-target') !== 'crm') { pauseGuide(); return; }
+        if (step !== -1) resumeGuide();
+        else showWelcome();
+      });
+    });
+    // The original workflow can also change modules through dashboard shortcuts.
+    var navigationObserver = new MutationObserver(function () {
+      if (step === -1) return;
+      if (!shell.classList.contains('active')) { if (!paused) pauseGuide(); return; }
+      if (paused) resumeGuide();
+      else if (activeStep() !== step) syncManualPane();
+    });
+    navigationObserver.observe(shell, {attributes: true, attributeFilter: ['class']});
+    shell.querySelectorAll('.crm-main-tabs [data-crm-pane]').forEach(function (tab) {
+      navigationObserver.observe(tab, {attributes: true, attributeFilter: ['class']});
+    });
+    // Scrolling past the homepage is also a real entrance to the cockpit.
+    var entranceObserver = new IntersectionObserver(function (entries) {
+      if (shell.classList.contains('active') && entries.some(function (entry) { return entry.isIntersecting; })) showWelcome();
+    }, {threshold: 0.5});
+    entranceObserver.observe(shell.querySelector(':scope > .header'));
+    entranceObserver.observe(shell.querySelector('.crm-commandbar'));
+    var abnormalRowsObserver = new MutationObserver(function () {
+      if (step >= 0 && !paused && steps[step].pane === 'abnormal') {
+        unlockRows();
+        lockRows();
+      }
+    });
+    abnormalRowsObserver.observe(element('crmAbnormalTableBody'), {childList: true});
     element('demoTicketClose').addEventListener('click', function () { element('demoTicketDialog').close(); });
     document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape' && !element('demoTicketDialog').open) close();
+      if (event.key === 'Escape' && !welcome.open && !element('demoTicketDialog').open && !paused) close();
     });
     document.addEventListener('click', function (event) {
       var target = event.target.closest('[data-demo-ticket], a[href]');
@@ -323,8 +375,8 @@
     return true;
   }
 
-  function next() { if (step < 0) return; if (step === titles.length - 1) close(); else { step += 1; renderStep(); } }
-  function previous() { if (step > 0) { step -= 1; renderStep(); } }
+  function next() { if (step < 0 || paused) return; if (step === steps.length - 1) close(); else goToStep(step + 1); }
+  function previous() { if (step > 0 && !paused) goToStep(step - 1); }
   window.WorkbenchTour = {start: start, next: next, previous: previous, close: close, currentStep: function () { return step; }};
   if (!initialize()) {
     var observer = new MutationObserver(function () {
